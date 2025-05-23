@@ -13,7 +13,7 @@ export default async function Home() {
     <div className="w-full px-20">
       <h1 className="font-bold text-3xl">Home</h1>
       <div className="flex items-center justify-between">
-        <Link href={'/snippet'} className="font-serif text-yellow-400 text-xl">Snippet</Link>
+        <h1 className="font-serif text-yellow-400 text-xl">Snippet</h1>
         <Button><Link href={'/snippet/new'}>New</Link></Button>
       </div>
       {
