@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-key */
+ 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
@@ -18,7 +18,7 @@ export default async function Home() {
       </div>
       {
         snippets.map((snippet) =>(
-          <div className="flex justify-between mt-3 border-white items-center bg-zinc-700 rounded-md p-3 font-semibold">
+          <div key={snippet.id} className="flex justify-between mt-3 border-white items-center bg-zinc-700 rounded-md p-3 font-semibold">
             <h1 className="text-shadow-green-100">{snippet.title}</h1>
             <Link href={`/snippet/${snippet.id}`}><Button variant={'link'} className="text-white">View</Button></Link>
           </div>

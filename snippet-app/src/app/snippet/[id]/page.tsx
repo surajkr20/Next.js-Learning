@@ -12,6 +12,8 @@ const SnippetDetails = async ({
 }) => {
   const id = parseInt((await params).id);
 
+  await new Promise((r) => setTimeout(r, 2000));
+
   const snippet = await prisma.snippet.findUnique({
     where: {
       id,
