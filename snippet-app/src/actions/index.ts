@@ -9,9 +9,16 @@ export const saveSnippet = async (id: number, code: string) =>{
             id
         },
         data: {
-            code
+            code,
         }
     })
-    console.log("code updates and saved in database")
+    redirect('/')
+}
+
+export const deleteSnippet = async (id: number) =>{
+    await prisma.snippet.delete({
+        where : {id}
+    })
+
     redirect('/')
 }

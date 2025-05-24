@@ -18,7 +18,8 @@ const EditPageSnippet = async ({
   return (
     <div className="w-full px-20 flex flex-col gap-5">
       <div>
-        <EditSnippetForm snippet={snippet} />
+        {snippet && <EditSnippetForm snippet={snippet} />}
+        {!snippet && <div>Snippet not found.</div>}
       </div>
     </div>
   );
