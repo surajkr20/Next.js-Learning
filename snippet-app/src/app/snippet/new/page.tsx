@@ -1,44 +1,47 @@
- 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
-import React from 'react'
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import React, { useActionState, useEffect, useRef, useState } from "react";
+import { createSnippet } from "@/actions";
+import { useRouter } from "next/navigation";
+import ErrorPage from "@/app/snippet/new/error";
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
-    async function createSnippet(formData: FormData){
-        "use server"    // use server directive
-        const title = formData.get('title') as string;    // accessing title
-        const code = formData.get('code') as string;  // accessing code
+  const [formStateData, action] = useActionState(createSnippet, {
+    message: "",
+    success: false,
+  });
 
-        // interacting with database
-        const snippet = await prisma.snippet.create({
-            data: {
-                title,
-                code
-            }
-        })
-
-        console.log("snippet created", snippet)
-        redirect('/');
+  useEffect(() => {
+    if (formStateData.success && !redirecting) {
+      formRef.current?.reset();
+      setRedirecting(true);
+      router.push("/");
     }
+  }, [formStateData.success, redirecting, router]);
 
   return (
-    <form action={createSnippet} className='w-full px-20 py-10 flex flex-col gap-6'>
-        <div className='flex flex-col gap-2'>
-            <Label>Title</Label>
-            <Input name='title' id='title'/>
-        </div>
-        <div className='flex flex-col gap-2'>
-            <Label>Code</Label>
-            <Textarea name='code' id='code'/>
-        </div>
-        <Button type='submit' >New</Button>
+    <form ref={formRef} action={action} className="w-full px-20 py-10 flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <Label>Title</Label>
+        <Input name="title" id="title" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Code</Label>
+        <Textarea name="code" id="code" />
+      </div>
+      {!formStateData.success && formStateData.message &&(
+        <ErrorPage error={new Error(formStateData.message)} className="bg-red-950 p-2 border-red-500 mt-2">{formStateData.message}</ErrorPage>
+      )}
+      <Button type="submit">New</Button>
     </form>
-  )
-}
+  );
+};
 
-export default page
+export default Page;
