@@ -3,6 +3,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import {revalidatePath} from "next/cache"
 
 export const saveSnippet = async (id: number, title: string, code: string) => {
   await prisma.snippet.update({
@@ -14,14 +15,15 @@ export const saveSnippet = async (id: number, title: string, code: string) => {
       title,
     },
   });
-  redirect("/");
+  revalidatePath(`/snippet/${id}`)
+  redirect(`/snippet/${id}`);
 };
 
 export const deleteSnippet = async (id: number) => {
   await prisma.snippet.delete({
     where: { id },
   });
-
+  revalidatePath('/')
   redirect("/");
 };
 
@@ -31,7 +33,10 @@ export async function createSnippet(_: any, formData: FormData) {
     const code = formData.get("code");
 
     if (typeof title !== "string" || title.length < 5) {
-      return { message: "Title must be at least 5 characters.", success: false };
+      return {
+        message: "Title must be at least 5 characters.",
+        success: false,
+      };
     }
 
     if (typeof code !== "string" || code.length < 8) {
@@ -42,14 +47,16 @@ export async function createSnippet(_: any, formData: FormData) {
 
     // Intentionally force an error for testing
     throw new Error("Failed to store snippet in database");
-
+    revalidatePath('/'); // on-demand caching for showing real time page changes
     return { message: "", success: true };
-  } catch (error: any) {
-    return {
-      message: error?.message || "Something went wrong",
-      success: false,
-    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        message: error?.message || "Something went wrong",
+        success: false,
+      };
+    } else {
+      return { message: "some internal server error" };
+    }
   }
 }
-
-

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import React from "react";
-import { deleteSnippet} from "@/actions"
+import { deleteSnippet} from "@/actions";
 import { notFound } from "next/navigation";
 
 const SnippetDetails = async ({
@@ -11,9 +11,7 @@ const SnippetDetails = async ({
   params: Promise<{ id: string }>;
 }) => {
   const id = parseInt((await params).id);
-
   await new Promise((r) => setTimeout(r, 2000));
-
   const snippet = await prisma.snippet.findUnique({
     where: {
       id,
@@ -43,3 +41,10 @@ const SnippetDetails = async ({
 };
 
 export default SnippetDetails;
+
+export const generateStaticParams = async () =>{
+  const snippets = await prisma.snippet.findMany(); // fetching snippets from db
+  return snippets.map((snippet) =>{
+    return {id: snippet.id.toString()}
+  })
+}
